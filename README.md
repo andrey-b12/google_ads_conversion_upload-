@@ -4,13 +4,14 @@
 This project was developed as part of a technical assessment for a Marketing Engineer role at Beamer/Userflow.
 
 It demonstrates:
-- Cleaning and enriching offline conversion data
-- Structuring payloads for the Google Ads API
-- Simulating an upload process with logging and error handling
+- Data cleaning and enrichment for offline conversions
+- Payload construction for Google Ads API
+- Simulated upload logic with error handling, retry strategy, and audit logging
+- Clear and prescriptive code documentation for readability and handoff
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 google_ads_conversion_upload/
@@ -23,27 +24,24 @@ google_ads_conversion_upload/
 │   └── upload_log.csv                # Simulated upload results (Part 2)
 │
 ├── src/
-│   ├── part1_data_processing.py      # Part 1: Data processing logic
-│   └── part2_upload_to_google.py     # Part 2: API upload simulation
+│   ├── part1_data_processing.py      # Part 1: Cleans & enriches conversion data
+│   └── part2_upload_to_google.py     # Part 2: Simulated upload with bonus features
 │
-├── README.md                         # Project overview & instructions
-└── requirements.txt                  # Python dependencies
+├── README.md                         # Project overview & run instructions
+└── requirements.txt                  # Python dependencies (if needed)
 ```
 
 ---
 
-## Part 1: Clean and Enrich Offline Conversion Data
+## Part 1: Data Cleaning and Enrichment
 
-### Features
-- Loads raw data from CSV
-- Formats timestamps for Google Ads API (`YYYY-MM-DD HH:MM:SS+00:00`)
-- Filters:
-  - `conversion_value > 0`
-  - Non-null `gclid`
-- Adds `value_bucket` field (`High` vs. `Low`)
-- Outputs results to `output/cleaned_conversions.csv`
+### Key Features
+- Removes records with missing `gclid` or zero `conversion_value`
+- Formats timestamps to Google Ads API specification (`YYYY-MM-DD HH:MM:SS+00:00`)
+- Adds a `value_bucket` column to group conversions into `High` or `Low` value tiers
+- Saves cleaned output to `output/cleaned_conversions.csv`
 
-### Run It
+### Run Part 1
 
 ```bash
 python src/part1_data_processing.py
@@ -51,16 +49,16 @@ python src/part1_data_processing.py
 
 ---
 
-## Part 2: Simulated Google Ads Upload
+## Part 2: Simulated Upload with Retry & Conversion Action Logic
 
-### Features
-- Loads cleaned data from Part 1
-- Mocks a Google Ads API upload call
-- Randomly returns success/failure responses
-- Logs results to `output/upload_log.csv`
-- Prints summary of total uploads, successes, and failures
+### Key Features
+- Simulates `ConversionUploadService` using realistic payload structure
+- Randomly returns `SUCCESS` or `FAILURE` with retry logic (exponential backoff)
+- Automatically checks and “creates” a simulated conversion action if not found
+- Logs each upload’s outcome, including number of attempts and error messages
+- Saves log to `output/upload_log.csv` and prints a summary
 
-### Run It
+### Run Part 2
 
 ```bash
 python src/part2_upload_to_google.py
@@ -68,21 +66,27 @@ python src/part2_upload_to_google.py
 
 ---
 
-## Design Principles
+## Bonus Logic Implemented
 
-- Modular scripts with clear separation of concerns
-- Simulated API logic mirrors Google Ads `ConversionUploadService`
-- Output logs for traceability and review
-- Prepped for real credential integration if needed
+- Automatically create conversion actions if they don't exist (simulated logic)
+- Add retry logic for intermittent failures or rate limits using exponential backoff
 
 ---
 
-## Next Steps (for real-world use)
+## Design Considerations
 
-To integrate this into a live Google Ads API system:
-- Replace the mock upload with actual API calls using the `google-ads` client library
-- Securely manage `developer_token`, `client_id`, and `refresh_token`
-- Add conversion action resource naming
+- Modular, self-contained scripts
+- Highly readable and prescriptive in-code comments
+- Output logs enable traceability and debugging
+- Designed for test-mode simulation but easily extendable to live API integration
 
 ---
+
+## Future Expansion for Production
+
+If this were a live implementation:
+- Replace `mock_upload_with_retry` with `google-ads` API client
+- Use `OAuth2` + Developer Token + Customer ID for authentication
+- Implement batching and partial failure handling per API specs
+- Use real `conversion_action` resource names tied to your Google Ads account
 
